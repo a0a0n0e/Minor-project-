@@ -3,3 +3,170 @@ import numpy as np
 from sklearn import metrics
 import matplotlib.pyplot as plt
 import seaborn as sns
+data = pd.read_excel(r'C:\Users\vsara\OneDrive\Desktop\VSP\DSML INTERNSHIP\MAIN PROJECT\Data Science\Minor Project\PROJECT.xlsx')
+data.head()
+
+Date	Open	High	Low	Close	Adj Close	Volume
+0	2018-02-05	262.000000	267.899994	250.029999	254.259995	254.259995	11896100
+1	2018-02-06	247.699997	266.700012	245.000000	265.720001	265.720001	12595800
+2	2018-02-07	266.579987	272.450012	264.329987	264.559998	264.559998	8981500
+3	2018-02-08	267.079987	267.619995	250.000000	250.100006	250.100006	9306700
+4	2018-02-09	253.850006	255.800003	236.110001	249.470001	249.470001	16906900
+
+data['Date'] = pd.to_datetime(data.Date)
+data.shape
+
+(1009, 7)
+
+data.drop('Adj Close', axis = 1, inplace = True)
+data.head()
+
+Date	Open	High	Low	Close	Volume
+0	2018-02-05	262.000000	267.899994	250.029999	254.259995	11896100
+1	2018-02-06	247.699997	266.700012	245.000000	265.720001	12595800
+2	2018-02-07	266.579987	272.450012	264.329987	264.559998	8981500
+3	2018-02-08	267.079987	267.619995	250.000000	250.100006	9306700
+4	2018-02-09	253.850006	255.800003	236.110001	249.470001	16906900
+
+data.isnull().sum()
+
+Date      0
+Open      0
+High      0
+Low       0
+Close     0
+Volume    0
+dtype: int64
+data.isna().any()
+Date      False
+Open      False
+High      False
+Low       False
+Close     False
+Volume    False
+dtype: bool
+data.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1009 entries, 0 to 1008
+Data columns (total 6 columns):
+ #   Column  Non-Null Count  Dtype         
+---  ------  --------------  -----         
+ 0   Date    1009 non-null   datetime64[ns]
+ 1   Open    1009 non-null   float64       
+ 2   High    1009 non-null   float64       
+ 3   Low     1009 non-null   float64       
+ 4   Close   1009 non-null   float64       
+ 5   Volume  1009 non-null   int64         
+dtypes: datetime64[ns](1), float64(4), int64(1)
+memory usage: 47.4 KB
+
+data.describe()
+
+Date	Open	High	Low	Close	Volume
+count	1009	1009.000000	1009.000000	1009.000000	1009.000000	1.009000e+03
+mean	2020-02-05 07:30:58.870168320	419.059673	425.320703	412.374044	419.000733	7.570685e+06
+min	2018-02-05 00:00:00	233.919998	250.649994	231.229996	233.880005	1.144000e+06
+25%	2019-02-06 00:00:00	331.489990	336.299988	326.000000	331.619995	4.091900e+06
+50%	2020-02-06 00:00:00	377.769989	383.010010	370.880005	378.670013	5.934500e+06
+75%	2021-02-05 00:00:00	509.130005	515.630005	502.529999	509.079987	9.322400e+06
+max	2022-02-04 00:00:00	692.349976	700.989990	686.090027	691.690002	5.890430e+07
+std	NaN	108.537532	109.262960	107.555867	108.289999	5.465535e+06
+print(len(data))
+
+1009
+
+data['Open'].plot(figsize=(16,6))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+x = data[['Open', 'High', 'Low', 'Volume']]
+y = data['Close']
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state = 0)
+x_train.shape
+(756, 4)
+x_test.shape
+(253, 4)
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import confusion_matrix, accuracy_score
+regressor = LinearRegression()
+regressor.fit(x_train, y_train)
+
+LinearRegression()
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+print(regressor.coef_)
+[-5.98637670e-01  7.42752459e-01  8.57948723e-01  9.68159261e-08]
+print(regressor.intercept_)
+-0.7077595560510304
+predicted = regressor.predict(x_test)
+print(x_test)
+            Open        High         Low    Volume
+801   557.000000  559.750000  550.299988   2720300
+311   378.000000  383.500000  374.510010   5398200
+85    368.540009  368.700012  357.799988   8278000
+435   278.049988  285.750000  277.350006   6248400
+204   260.549988  266.250000  253.800003  12498600
+...          ...         ...         ...       ...
+583   418.829987  426.720001  415.980011   3743700
+200   283.790009  285.089996  269.149994  12993800
+767   525.000000  548.539978  518.280029   4136500
+1000  379.140015  387.709991  365.130005  15145800
+385   298.859985  303.549988  296.269989   6905800
+
+[253 rows x 4 columns]
+predicted.shape
+(253,)
+dframe = pd.DataFrame(y_test, predicted)
+dfr = pd.DataFrame({'Actual_Price':y_test, 'Predicted_Price':predicted})
+print(dfr)
+Actual_Price  Predicted_Price
+801     553.729980       553.999288
+311     379.059998       379.685786
+85      361.399994       360.298634
+435     281.859985       283.639587
+204     261.429993       260.032497
+...            ...              ...
+583     425.920013       422.764132
+200     270.600006       273.331047
+767     546.150024       537.495050
+1000    366.420013       375.026471
+385     302.799988       300.698946
+
+[253 rows x 2 columns]
+dfr.head()
+Actual_Price	Predicted_Price
+801	553.729980	553.999288
+311	379.059998	379.685786
+85	361.399994	360.298634
+435	281.859985	283.639587
+204	261.429993	260.032497
+
+from sklearn.metrics import confusion_matrix, accuracy_score
+regressor.score(x_test, y_test)
+0.9982601041694787
+import math
+print('Mean_Squared_Error:', metrics.mean_squared_error(y_test, predicted))
+Mean_Squared_Error: 19.163612341200622
+print('Root_Mean_Squared_Error:', math.sqrt(metrics.mean_squared_error(y_test, predicted)))
+Root_Mean_Squared_Error: 4.377626336406594
+graph = dfr.head(20)
+graph.plot(kind = 'bar')
+
+
+
